@@ -11,6 +11,7 @@ public class ImageGrabber : MonoBehaviour {
 
     //Key is url
     Dictionary<string, Sprite> Icons = new Dictionary<string, Sprite>();
+    Dictionary<string, Texture> Textures = new Dictionary<string, Texture>();
 
     public void GetIcon(string url, Action<Sprite> callback)
     {
@@ -18,13 +19,20 @@ public class ImageGrabber : MonoBehaviour {
             return;
 
         if (Icons.ContainsKey(url))
-        {
             callback(Icons[url]);
-        }
-        if (callback != null)
-        {
+        else if (callback != null)
             StartCoroutine(DownloadIcon(url, callback));
-        }
+    }
+
+    public void GetTexture(string url, Action<Texture> callback)
+    {
+        if (String.IsNullOrEmpty(url))
+            return;
+
+        if (Textures.ContainsKey(url))
+            callback(Textures[url]);
+        else if (callback != null)
+            StartCoroutine(DownloadTexture(url, callback));
     }
 	
     IEnumerator DownloadIcon(string url, Action<Sprite> callback)
@@ -43,5 +51,15 @@ public class ImageGrabber : MonoBehaviour {
             }
             callback(icon);
         }
+    }
+
+    IEnumerator DownloadTexture(string url, Action<Texture> callback)
+    {
+        WWW www = new WWW(url);
+        yield return www;
+        if (www.error != null)
+            callback(null);
+        else
+            callback(www.texture);
     }
 }
